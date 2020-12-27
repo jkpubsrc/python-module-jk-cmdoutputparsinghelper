@@ -45,9 +45,10 @@ class ValueParser_ByteWithUnit(object):
 		s = s.strip()
 		if not s:
 			raise ValueError(s)
+		s2 = s.upper()
 
 		for k, factor in ValueParser_ByteWithUnit.__UNITS.items():
-			if s.endswith(k):
+			if s2.endswith(k):
 				s = s[:-len(k)].strip()
 				return int(s) * factor
 
