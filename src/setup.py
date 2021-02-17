@@ -34,7 +34,7 @@ setup(
 	packages = [
 		"jk_cmdoutputparsinghelper",
 	],
-	version = "0.2020.12.27",
+	version = "0.2021.2.17",
 	zip_safe = False,
 	long_description = readme(),
 	long_description_content_type="text/markdown",

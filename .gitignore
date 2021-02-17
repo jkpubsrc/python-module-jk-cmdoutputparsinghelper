@@ -1,8 +1,8 @@
-﻿src/dist/
+﻿src/build/
+src/dist/
 src/*.egg-info/
 **/__pycache__/
 .svn/
 .vscode
 examples/*.log
-testing/input_*
-
+examples/input_*.txt

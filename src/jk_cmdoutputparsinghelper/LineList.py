@@ -110,19 +110,6 @@ class LineList(list):
 	#
 
 	#
-	# This method modifies this line list *in place*. It calls <c>getLeadingSpaceCounts()</c> in order to get a map of leading spaces and then trims the start of the line to
-	# have all common (!) leading spaces removed.
-	#
-	def removeAllLeadingSpaces(self):
-		counts = self.getLeadingSpaceCounts()
-		minPos = min(counts)
-		if minPos > 0:
-			newLines = [ s[minPos:] for s in self ]
-			self.clear()
-			self.extend(newLines)
-	#
-
-	#
 	# @param		bool bRStrip		Perform an <c>rstrip()</c> on each line.
 	#
 	def extractColumn(self, fromPos:typing.Union[int,None], toPos:typing.Union[int,None], bRStrip:bool = True) -> list:
@@ -281,6 +268,43 @@ class LineList(list):
 			ret.append(buffer)
 
 		return ret
+	#
+
+	#
+	# This method modifies this line list *in place*. It removes all trailing white spaces of each line.
+	#
+	def rightTrimAllLines(self):
+		for i in range(0, len(self)):
+			self[i] = self[i].rstrip()
+	#
+
+	#
+	# This method modifies this line list *in place*. It removes all emtpy lines at the beginning of this line list.
+	#
+	def removeLeadingEmptyLines(self):
+		while self and not self[0]:
+			del self[0]
+	#
+
+	#
+	# This method modifies this line list *in place*. It removes all emtpy lines at the end of this line list.
+	#
+	def removeTrailingEmptyLines(self):
+		while self and not self[-1]:
+			del self[-1]
+	#
+
+	#
+	# This method modifies this line list *in place*. It calls <c>getLeadingSpaceCounts()</c> in order to get a map of leading spaces and then trims the start of the line to
+	# have all common (!) leading spaces removed.
+	#
+	def removeAllCommonLeadingSpaces(self):
+		counts = self.getLeadingSpaceCounts()
+		minPos = min(counts)
+		if minPos > 0:
+			newLines = [ s[minPos:] for s in self ]
+			self.clear()
+			self.extend(newLines)
 	#
 
 	################################################################################################################################

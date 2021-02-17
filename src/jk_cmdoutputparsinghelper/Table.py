@@ -2,7 +2,11 @@
 
 import typing
 
-import jk_datamatrix
+try:
+	import jk_datamatrix
+	bHasDataMatrix = True
+except:
+	bHasDataMatrix = False
 
 from .ColumnDef import ColumnDef
 
@@ -95,7 +99,12 @@ class Table(list):
 	#
 	# Build a data matrix from this table.
 	#
-	def toDataMatrix(self, columnDefs:typing.List[ColumnDef] = None) -> jk_datamatrix.DataMatrix:
+	def toDataMatrix(self, columnDefs:typing.List[ColumnDef] = None):
+		if not bHasDataMatrix:
+			raise Exception("For invoking toDataMatrix() you need to install jk_datamatrix first: 'pip install jk_datamatrix'")
+
+		# ----
+
 		if columnDefs is None:
 			columnDefs = self.columnDefs
 		assert len(columnDefs) == self.nColumns
