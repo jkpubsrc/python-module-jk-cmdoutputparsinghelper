@@ -5,7 +5,7 @@
 	},
 	"meta": {
 		"name": "jk_cmdoutputparsinghelper",
-		"version": "0.2021.2.17",
+		"version": "0.2021.2.17.1",
 		"packageClass": "python-module",
 		"language": "python3",
 		"development_status": "alpha",
@@ -22,6 +22,9 @@
 		],
 	},
 	"requirements": {
+		"recommended_python_packages": [
+			"jk_datamatrix",
+		],
 		"python_packages": [
 		],
 		"python_packages_dev": [

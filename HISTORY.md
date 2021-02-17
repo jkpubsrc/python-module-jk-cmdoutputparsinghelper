@@ -4,5 +4,5 @@
 	* Added: documentation for some classes
 	* Added: examples
 	* Added: HISTORY.md
-
-
+	* Improved: TextData to handle empty content more precisely
+	* Added: unit test for TextData

@@ -46,7 +46,10 @@ class TextData(object):
 	def lines(self) -> LineList:
 		if not self.__bStoringLines:
 			# convert to lines
-			self.__data = LineList(self.__data.split("\n"))
+			if self.__data:
+				self.__data = LineList(self.__data.split("\n"))
+			else:
+				self.__data = LineList()
 			self.__bStoringLines = True
 		return self.__data
 	#
