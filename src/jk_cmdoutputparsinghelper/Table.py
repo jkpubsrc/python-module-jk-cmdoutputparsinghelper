@@ -99,6 +99,8 @@ class Table(list):
 	#
 	# Build a data matrix from this table.
 	#
+	# NOTE: Invoking this method requires the python module "<c>jk_datamatrix</c>" to be installed.
+	#
 	def toDataMatrix(self, columnDefs:typing.List[ColumnDef] = None):
 		if not bHasDataMatrix:
 			raise Exception("For invoking toDataMatrix() you need to install jk_datamatrix first: 'pip install jk_datamatrix'")
