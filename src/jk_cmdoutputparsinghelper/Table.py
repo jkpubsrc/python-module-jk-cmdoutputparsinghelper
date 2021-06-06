@@ -17,6 +17,7 @@ from .ColumnDef import ColumnDef
 
 #
 # This class is derived from <c>list</c> and represents a very simple table. The items in this (table) list are rows of this table.
+# The member <c>columnDefs</c> stores an array of <c>ColumnDef</c> objects that provide information about each column.
 #
 class Table(list):
 	# @field		ColumnDef[] columnDefs		The table column definitions
@@ -96,6 +97,41 @@ class Table(list):
 	## Public Methods
 	################################################################################################################################
 
+	def dump(self, prefix:str = None, printFunc = None):
+		if prefix is None:
+			prefix = ""
+		else:
+			assert isinstance(prefix, str)
+
+		if printFunc is None:
+			printFunc = print
+		else:
+			assert callable(printFunc)
+
+		# ----
+
+		prefix2 = prefix + "\t"
+		printFunc(prefix + "{")
+		if self.columnDefs:
+			sout = [ prefix2, "[ " ]
+			for cd in self.columnDefs:
+				if len(sout) > 2:
+					sout.append(", ")
+				sout.append(str(cd))
+			sout.append(" ]")
+			printFunc("".join(sout))
+		for row in self:
+			sout = [ prefix2, "[ " ]
+			for cell in row:
+				if len(sout) > 2:
+					sout.append(", ")
+				sout.append(repr(cell))
+			sout.append(" ]")
+			printFunc("".join(sout))
+			
+		printFunc(prefix + "}")
+	#
+
 	#
 	# Build a data matrix from this table.
 	#
@@ -126,6 +162,18 @@ class Table(list):
 			m.addRow(*rowData)
 
 		return m
+	#
+
+	#
+	# Returns an iterator that provides dictionaries of data, one for each row.
+	#
+	def rowDictIterator(self):
+		_nColumns = self.nColumns
+		for row in self:
+			ret = {}
+			for i in range(0, _nColumns):
+				ret[self.columnDefs[i].name] = row[i]
+			yield ret
 	#
 
 #

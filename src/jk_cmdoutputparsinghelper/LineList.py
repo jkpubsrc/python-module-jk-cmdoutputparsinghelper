@@ -59,7 +59,17 @@ class LineList(list):
 		return ret
 	#
 
+	#
+	# Check if the specified column is a vertical space column (= all characters at position <i>pos</i> are spaces)
+	#
 	def isVerticalSpaceColumn(self, pos:int) -> bool:
+		return self.isSpaceColumn(pos)
+	#
+
+	#
+	# Check if the specified column is a vertical space column (= all characters at position <i>pos</i> are spaces)
+	#
+	def isSpaceColumn(self, pos:int) -> bool:
 		for i in range(0, len(self)):
 			line = self[i]
 			if pos < len(line):
@@ -68,6 +78,46 @@ class LineList(list):
 					return False
 		#print("@ " + str(pos) + " is space")
 		return True
+	#
+
+	#
+	# Considers the existing line data as a rectangular block of text. This block is then scanned for vertical lines that only contain spaces.
+	# This method then returns a list of boolean values, each representing wether or not this column contains spaces.
+	# The length of the list is therefore equal to the length of the longest line.
+	#
+	# @return		bool[] listOfSpaceColumns		One boolean value for every column.
+	#
+	def identifyAllSpaceColumns(self) -> list:
+		maxLineLength = max([ len(line) for line in self ])
+		assert maxLineLength > 0
+
+		ret = []
+		for i in range(0, maxLineLength):
+			ret.append(self.isSpaceColumn(i))
+		return ret
+	#
+
+	#
+	# @return		int[] spaceColumnPositions		Suitable positions to split at if you intend to convert this list to a table.
+	#
+	def identifySpaceColumnPositions(self) -> list:
+		maxLineLength = max([ len(line) for line in self ])
+		assert maxLineLength > 0
+
+		ret = []
+		bLastWasTrue = False
+		bAllowAppending = not self.isSpaceColumn(0)
+		iLast = -1
+		for i in range(0, maxLineLength):
+			b = self.isSpaceColumn(i)
+			if not b and bLastWasTrue:
+				if bAllowAppending:
+					ret.append(iLast)
+				bAllowAppending = True
+			bLastWasTrue = b
+			iLast = i
+
+		return ret
 	#
 
 	def dump(self, prefix:str = None, printFunc = None):
@@ -110,25 +160,28 @@ class LineList(list):
 	#
 
 	#
-	# @param		bool bRStrip		Perform an <c>rstrip()</c> on each line.
+	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
 	#
-	def extractColumn(self, fromPos:typing.Union[int,None], toPos:typing.Union[int,None], bRStrip:bool = True) -> list:
+	def extractColumn(self, fromPos:typing.Union[int,None], toPos:typing.Union[int,None], bLStrip:bool, bRStrip:bool) -> list:
 		if fromPos is not None:
 			isinstance(fromPos, int)
 		if toPos is not None:
 			isinstance(toPos, int)
 		if (fromPos is None) and (toPos is None):
 			raise Exception("Parameters!")
+		assert isinstance(bLStrip, bool)
 		assert isinstance(bRStrip, bool)
 
 		ret = []
 
 		for line in self:
 			s = line[fromPos:toPos]
+			if bLStrip:
+				s = s.lstrip()
 			if bRStrip:
-				ret.append(s.rstrip())
-			else:
-				ret.append(s)
+				s = s.rstrip()
+			ret.append(s)
 
 		return ret
 	#
@@ -136,32 +189,44 @@ class LineList(list):
 	#
 	# Get a list of columns. Each column contains the strings found in the specified position range.
 	#
-	# @param		bool bRStrip		Perform an <c>rstrip()</c> on each line.
+	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
 	#
-	def extractColumns(self, positions:typing.Union[tuple,list], bRStrip:bool = True) -> list:
+	def extractColumns(self, positions:typing.Union[tuple,list], bLStrip:bool, bRStrip:bool) -> list:
+		assert positions
+		if positions[0] != 0:
+			positions = [ 0 ] + positions
+
 		ret = []
 		for i in range(1, len(positions)):
 			fromPos, toPos = positions[i-1], positions[i]
-			ret.append(self.extractColumn(fromPos, toPos, bRStrip))
-		ret.append(self.extractColumn(positions[-1], None, bRStrip))
+			ret.append(self.extractColumn(fromPos, toPos, bLStrip, bRStrip))
+		ret.append(self.extractColumn(positions[-1], None, bLStrip, bRStrip))
+
 		return ret
 	#
 
 	#
 	# This method creates a string table from this line list.
-	# It splits the lines at the specified positions and returns an instance of <c>StringTable</c>
+	# It splits the lines at the specified positions and returns an instance of <c>Table</c>
 	# containing all data.
 	#
-	# @param		bool bRStrip		Perform an <c>rstrip()</c> on each line.
+	# @param		int[] positions					The split positions
+	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
+	# @param		bool bFirstLineIsHeader			Specify <c>true</c> here if the first line contains header information.
 	#
 	def createStrTableFromColumns(self,
 		positions:typing.Union[tuple,list],
-		bRStrip:bool = True,
-		bFirstLineIsHeader:bool = False) -> Table:
+		bLStrip:bool,
+		bRStrip:bool,
+		bFirstLineIsHeader:bool) -> Table:
 
+		assert isinstance(bLStrip, bool)
+		assert isinstance(bRStrip, bool)
 		assert isinstance(bFirstLineIsHeader, bool)
 
-		columnsData = self.extractColumns(positions, bRStrip)
+		columnsData = self.extractColumns(positions, bLStrip, bRStrip)
 		nColumns = len(columnsData)
 		nRows = len(columnsData[0])
 
@@ -188,23 +253,31 @@ class LineList(list):
 	#
 
 	#
-	# Invokes <c>createStrTableFromColumns()</c> to 
+	# Invokes <c>createStrTableFromColumns()</c> to create a string table and then converts this data to a data table.
 	#
-	# @param		bool bRStrip		Perform an <c>rstrip()</c> on each line.
+	# @param		int[] positions					The split positions
+	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
+	# @param		bool bFirstLineIsHeader			Specify <c>true</c> here if the first line contains header information.
+	# @param		str[]|ColumnDef[] columnDefs	A set of column definitions, one for each column.
+	#												If column definitions are specified together wih <c>bFirstLineIsHeader == True</c> the first line is removed and the column definitions
+	#												are used to form the table header.
 	#
 	def createDataTableFromColumns(self,
-		positions:typing.Union[tuple,list],
-		bRStrip:bool = True,
-		bFirstLineIsHeader:bool = False,
-		columnDefs:typing.Union[tuple,list,None] = None) -> Table:
+				positions:typing.Union[tuple,list],
+				bLStrip:bool,
+				bRStrip:bool,
+				bFirstLineIsHeader:bool,
+				columnDefs:typing.Union[tuple,list,None]
+			) -> Table:
 
 		assert isinstance(bFirstLineIsHeader, bool)
 
-		table = self.createStrTableFromColumns(positions, bRStrip)
+		table = self.createStrTableFromColumns(positions, bLStrip, bRStrip, bFirstLineIsHeader=False)
 
 		if columnDefs is not None:
 			assert isinstance(columnDefs, (tuple,list))
-			if len(columnDefs) != len(positions):
+			if len(columnDefs) != table.nColumns:
 				raise Exception("Number of header entries specified does not match the number of columns specified!")
 			_tmp = []
 			for item in columnDefs:
@@ -217,6 +290,7 @@ class LineList(list):
 				columnDefs = _tmp
 			if bFirstLineIsHeader:
 				del table[0]
+
 		else:
 			if bFirstLineIsHeader:
 				columnTitles = table[0]
@@ -269,6 +343,8 @@ class LineList(list):
 
 		return ret
 	#
+
+	#def createStrTableAtSpaceColumns(
 
 	#
 	# This method modifies this line list *in place*. It removes all trailing white spaces of each line.
