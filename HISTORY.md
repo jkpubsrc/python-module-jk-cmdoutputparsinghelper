@@ -12,3 +12,4 @@
 
 * 2021-07-04
 	* Improved: Error message and documentation in LineList
+	* Improved: identifySpaceColumnPositions()
