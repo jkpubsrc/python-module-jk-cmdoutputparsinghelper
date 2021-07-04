@@ -98,11 +98,15 @@ class LineList(list):
 	#
 
 	#
+	# @param		int? maxSplitPositions			The maximum number of split positions. Specify None if not applicable.
 	# @return		int[] spaceColumnPositions		Suitable positions to split at if you intend to convert this list to a table.
 	#
-	def identifySpaceColumnPositions(self) -> list:
+	def identifySpaceColumnPositions(self, maxSplitPositions:int = None) -> list:
 		maxLineLength = max([ len(line) for line in self ])
 		assert maxLineLength > 0
+		if maxSplitPositions is not None:
+			assert isinstance(maxSplitPositions, int)
+			assert maxSplitPositions > 0
 
 		ret = []
 		bLastWasTrue = False
@@ -113,6 +117,8 @@ class LineList(list):
 			if not b and bLastWasTrue:
 				if bAllowAppending:
 					ret.append(iLast)
+					if maxSplitPositions and (len(ret) >= maxSplitPositions):
+						break
 				bAllowAppending = True
 			bLastWasTrue = b
 			iLast = i
@@ -120,7 +126,7 @@ class LineList(list):
 		return ret
 	#
 
-	def dump(self, prefix:str = None, printFunc = None):
+	def dump(self, prefix:str = None, printFunc = None, splitPositions:list = None):
 		if prefix is None:
 			prefix = ""
 		else:
@@ -133,9 +139,15 @@ class LineList(list):
 
 		# ----
 
-		lines = json.dumps(self, indent="\t").split("\n")
-		for line in lines:
-			printFunc(prefix + line)
+		if splitPositions:
+			table = self.createStrTableFromColumns(splitPositions, False, False, bFirstLineIsHeader=False)
+			for row in table:
+				line = "|" + "|".join(row) + "|"
+				printFunc(prefix + line)
+		else:
+			lines = json.dumps(self, indent="\t").split("\n")
+			for line in lines:
+				printFunc(prefix + line)
 	#
 
 	#
@@ -278,7 +290,7 @@ class LineList(list):
 		if columnDefs is not None:
 			assert isinstance(columnDefs, (tuple,list))
 			if len(columnDefs) != table.nColumns:
-				raise Exception("Number of column definitions specified ({}) does not match the number of existing columns ({})!".format(len(columnDefs), table.nColumns))
+				raise Exception("Number of column definitions specified ({}) does not match the number of column splits ({})!".format(len(columnDefs), table.nColumns))
 			_tmp = []
 			for item in columnDefs:
 				if isinstance(item, str):
