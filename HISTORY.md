@@ -9,3 +9,6 @@
 
 * 2021-06-06
 	* Improved: added more convenience methods to LineList and Table
+
+* 2021-07-04
+	* Improved: Error message and documentation in LineList

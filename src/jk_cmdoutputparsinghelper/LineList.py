@@ -260,8 +260,8 @@ class LineList(list):
 	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
 	# @param		bool bFirstLineIsHeader			Specify <c>true</c> here if the first line contains header information.
 	# @param		str[]|ColumnDef[] columnDefs	A set of column definitions, one for each column.
-	#												If column definitions are specified together wih <c>bFirstLineIsHeader == True</c> the first line is removed and the column definitions
-	#												are used to form the table header.
+	#												If column definitions are specified together with <c>bFirstLineIsHeader == True</c> the first line is removed and the column definitions
+	#												specified are used to form the table header.
 	#
 	def createDataTableFromColumns(self,
 				positions:typing.Union[tuple,list],
@@ -278,7 +278,7 @@ class LineList(list):
 		if columnDefs is not None:
 			assert isinstance(columnDefs, (tuple,list))
 			if len(columnDefs) != table.nColumns:
-				raise Exception("Number of header entries specified does not match the number of columns specified!")
+				raise Exception("Number of column definitions specified ({}) does not match the number of existing columns ({})!".format(len(columnDefs), table.nColumns))
 			_tmp = []
 			for item in columnDefs:
 				if isinstance(item, str):
