@@ -126,6 +126,22 @@ class LineList(list):
 		return ret
 	#
 
+	def identifyRowsStartingWithSpaces(self) -> list:
+		ret = []
+		for i, line in enumerate(self):
+			if (len(line) > 0) and (line[0] in ( ' ', '\t' )):
+				ret.append(i)
+		return ret
+	#
+
+	def identifyRowsNotStartingWithSpaces(self) -> list:
+		ret = []
+		for i, line in enumerate(self):
+			if not ((len(line) > 0) and (line[0] in ( ' ', '\t' ))):
+				ret.append(i)
+		return ret
+	#
+
 	def dump(self, prefix:str = None, printFunc = None, splitPositions:list = None):
 		if prefix is None:
 			prefix = ""
@@ -145,9 +161,10 @@ class LineList(list):
 				line = "|" + "|".join(row) + "|"
 				printFunc(prefix + line)
 		else:
-			lines = json.dumps(self, indent="\t").split("\n")
-			for line in lines:
-				printFunc(prefix + line)
+			printFunc(prefix + "LineList<[")
+			for item in self:
+				printFunc(prefix + "\t" + repr(item) + ",")
+			printFunc(prefix + "]>")
 	#
 
 	#
@@ -394,6 +411,99 @@ class LineList(list):
 			self.clear()
 			self.extend(newLines)
 	#
+
+	def findExact(self, lineText:str, startIndex:int = 0) -> int:
+		for i in range(startIndex, len(self)):
+			line = self[i]
+			if line == lineText:
+				return i
+
+		return -1
+	#
+
+	def findBckwdExact(self, lineText:str, startIndex:int = -1) -> int:
+		if startIndex < 0:
+			startIndex = len(self) - 1
+
+		for i in reversed(range(0, startIndex)):
+			line = self[i]
+			if line == lineText:
+				return i
+
+		return -1
+	#
+
+	def extractFromTo(self, fromIndex:int, toIndex:int = None):
+		if toIndex is None:
+			ret = self[fromIndex:]
+		else:
+			ret = self[fromIndex:toIndex]
+		return LineList(ret)
+	#
+
+	def splitAtRows(self, rowNumbers:list) -> list:
+		if not rowNumbers:
+			return self
+
+		ret = []
+		lastSplitPos = 0
+		for rowNo in rowNumbers:
+			if rowNo <= lastSplitPos:
+				continue
+			ret.append(self.extractFromTo(lastSplitPos, rowNo))
+			lastSplitPos = rowNo
+
+		if rowNumbers[-1] < len(self):
+			ret.append(self.extractFromTo(lastSplitPos))
+
+		return ret
+	#
+
+	#
+	# Check if all lines have the same prefix
+	#
+	def hasCommonPrefix(self, text:str) -> bool:
+		if not self:
+			# no data
+			return False
+
+		for line in self:
+			if not line.startswith(text):
+				return False
+		return True
+	#
+
+	#
+	# Check if all lines have the same prefix and then remove it
+	#
+	def removeCommonPrefix(self, text:str):
+		if not self.hasCommonPrefix(text):
+			raise Exception("Not a common prefix: " + repr(text))
+
+		nSkip = len(text)
+		newData = []
+		for line in self:
+			newData.append(line[nSkip:])
+
+		self.clear()
+		self.extend(newData)
+	#
+
+	#
+	# Try to split each line at the specified delimiter and return the result as key value pairs.
+	# Lines that do not contain the delimiter are skipped.
+	#
+	def convertToMapAtDelimIfPossible(self, delim:str) -> dict:
+		assert delim
+
+		ret = {}
+		for line in self:
+			pos = line.find(delim)
+			if pos > 0:
+				ret[line[:pos].strip()] = line[pos+1:].strip()
+		return ret
+	#
+
 
 	################################################################################################################################
 	## Static Methods

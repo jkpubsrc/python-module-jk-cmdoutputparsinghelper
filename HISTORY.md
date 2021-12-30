@@ -13,3 +13,7 @@
 * 2021-07-04
 	* Improved: Error message and documentation in LineList
 	* Improved: identifySpaceColumnPositions()
+
+* 2021-12-30
+	* Added: additional parsing functionality
+	* Extended: byte size parsing
