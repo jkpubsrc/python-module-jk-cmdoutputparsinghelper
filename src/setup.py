@@ -23,19 +23,26 @@ setup(
 		"Programming Language :: Python :: 3",
 	],
 	description = "Assists in parsing output of *nix system commands such as df, systemctrl and others.",
-	include_package_data = False,
+	include_package_data = True,
 	install_requires = [
+		"jk_typing",
+		"jk_prettyprintobj",
 	],
 	keywords = [
-		"...",
 	],
 	license = "proprietary",
 	name = "jk_cmdoutputparsinghelper",
+	package_data = {
+		"": [
+		],
+	},
 	packages = [
 		"jk_cmdoutputparsinghelper",
 	],
-	version = "0.2021.12.30",
+	scripts = [
+	],
+	version = '0.2023.2.9',
 	zip_safe = False,
 	long_description = readme(),
-	long_description_content_type="text/markdown",
+	long_description_content_type = "text/markdown",
 )

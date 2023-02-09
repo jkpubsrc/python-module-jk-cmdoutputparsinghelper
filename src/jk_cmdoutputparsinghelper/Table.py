@@ -33,7 +33,8 @@ class Table(list):
 	def __init__(self, columnDefs:typing.List[ColumnDef], rows:list):
 		assert isinstance(columnDefs, (tuple, list))
 		assert isinstance(rows, (tuple, list))
-		assert len(columnDefs) == len(rows[0])
+		if len(rows) > 0:
+			assert len(columnDefs) == len(rows[0])
 		for h in columnDefs:
 			assert isinstance(h, ColumnDef)
 

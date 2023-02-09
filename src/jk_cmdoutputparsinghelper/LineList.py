@@ -1,7 +1,6 @@
 
 
 import typing
-import json
 
 from .ColumnDef import ColumnDef
 from .Table import Table
@@ -87,7 +86,7 @@ class LineList(list):
 	#
 	# @return		bool[] listOfSpaceColumns		One boolean value for every column.
 	#
-	def identifyAllSpaceColumns(self) -> list:
+	def identifyAllSpaceColumns(self) -> typing.List[bool]:
 		maxLineLength = max([ len(line) for line in self ])
 		assert maxLineLength > 0
 
@@ -98,29 +97,32 @@ class LineList(list):
 	#
 
 	#
-	# @param		int? maxSplitPositions			The maximum number of split positions. Specify None if not applicable.
+	# This method identifies all split positions.
+	# A split position is characterizd by the previous column being a space column and the current column not being a space column.
+	#
+	# @param		int? maxSplitPositions			(optional) The maximum number of split positions. Specify None if not applicable.
 	# @return		int[] spaceColumnPositions		Suitable positions to split at if you intend to convert this list to a table.
 	#
-	def identifySpaceColumnPositions(self, maxSplitPositions:int = None) -> list:
+	def identifySpaceColumnPositions(self, maxSplitPositions:int = None) -> typing.List[int]:
 		maxLineLength = max([ len(line) for line in self ])
 		assert maxLineLength > 0
 		if maxSplitPositions is not None:
 			assert isinstance(maxSplitPositions, int)
 			assert maxSplitPositions > 0
 
-		ret = []
-		bLastWasTrue = False
-		bAllowAppending = not self.isSpaceColumn(0)
-		iLast = -1
+		ret:typing.List[int] = []
+		bLastWasSpaceColumn:bool = False
+		bAllowAppending:bool = not self.isSpaceColumn(0)
+		iLast:int = -1
 		for i in range(0, maxLineLength):
-			b = self.isSpaceColumn(i)
-			if not b and bLastWasTrue:
+			bThisIsSpaceColumn = self.isSpaceColumn(i)
+			if not bThisIsSpaceColumn and bLastWasSpaceColumn:
 				if bAllowAppending:
 					ret.append(iLast)
 					if maxSplitPositions and (len(ret) >= maxSplitPositions):
 						break
 				bAllowAppending = True
-			bLastWasTrue = b
+			bLastWasSpaceColumn = bThisIsSpaceColumn
 			iLast = i
 
 		return ret
@@ -240,16 +242,17 @@ class LineList(list):
 	# It splits the lines at the specified positions and returns an instance of <c>Table</c>
 	# containing all data.
 	#
-	# @param		int[] positions					The split positions
-	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
-	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
-	# @param		bool bFirstLineIsHeader			Specify <c>true</c> here if the first line contains header information.
+	# @param		int[] positions					(required) The split positions
+	# @param		bool bLStrip					(required) Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					(required) Perform an <c>rstrip()</c> on each line.
+	# @param		bool bFirstLineIsHeader			(required) Specify <c>true</c> here if the first line contains header information.
 	#
 	def createStrTableFromColumns(self,
-		positions:typing.Union[tuple,list],
-		bLStrip:bool,
-		bRStrip:bool,
-		bFirstLineIsHeader:bool) -> Table:
+			positions:typing.Union[tuple,list],
+			bLStrip:bool,
+			bRStrip:bool,
+			bFirstLineIsHeader:bool
+		) -> Table:
 
 		assert isinstance(bLStrip, bool)
 		assert isinstance(bRStrip, bool)
@@ -284,23 +287,29 @@ class LineList(list):
 	#
 	# Invokes <c>createStrTableFromColumns()</c> to create a string table and then converts this data to a data table.
 	#
-	# @param		int[] positions					The split positions
-	# @param		bool bLStrip					Perform an <c>lstrip()</c> on each line.
-	# @param		bool bRStrip					Perform an <c>rstrip()</c> on each line.
-	# @param		bool bFirstLineIsHeader			Specify <c>true</c> here if the first line contains header information.
-	# @param		str[]|ColumnDef[] columnDefs	A set of column definitions, one for each column.
+	# @param		int[] positions					(required) The split positions
+	# @param		bool bLStrip					(required) Perform an <c>lstrip()</c> on each line.
+	# @param		bool bRStrip					(required) Perform an <c>rstrip()</c> on each line.
+	# @param		bool bFirstLineIsHeader			(required) Specify <c>true</c> here if the first line contains header information.
+	# @param		str[]|ColumnDef[] columnDefs	(required) A set of column definitions, one for each column.
 	#												If column definitions are specified together with <c>bFirstLineIsHeader == True</c> the first line is removed and the column definitions
 	#												specified are used to form the table header.
 	#
 	def createDataTableFromColumns(self,
-				positions:typing.Union[tuple,list],
-				bLStrip:bool,
-				bRStrip:bool,
-				bFirstLineIsHeader:bool,
-				columnDefs:typing.Union[tuple,list,None]
-			) -> Table:
-
+			positions:typing.Union[tuple,list],
+			bLStrip:bool,
+			bRStrip:bool,
+			bFirstLineIsHeader:bool,
+			columnDefs:typing.Union[tuple,list,None]
+		) -> Table:
+		assert positions
+		if positions[0] != 0:
+			positions.insert(0, 0)
+		assert isinstance(bLStrip, bool)
+		assert isinstance(bRStrip, bool)
 		assert isinstance(bFirstLineIsHeader, bool)
+
+		# ----
 
 		table = self.createStrTableFromColumns(positions, bLStrip, bRStrip, bFirstLineIsHeader=False)
 
@@ -343,6 +352,7 @@ class LineList(list):
 				else:
 					rowData.append(s)
 			ret.append(rowData)
+
 		return Table(columnDefs, ret)
 	#
 

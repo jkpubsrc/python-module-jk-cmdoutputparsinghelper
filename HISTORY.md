@@ -17,3 +17,8 @@
 * 2021-12-30
 	* Added: additional parsing functionality
 	* Extended: byte size parsing
+
+* 2023-02-09
+	* Refactoring
+	* Added: Documentation
+	* Added: CharMatrix and various other classes

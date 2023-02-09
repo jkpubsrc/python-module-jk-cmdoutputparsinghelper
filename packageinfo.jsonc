@@ -1,53 +1,41 @@
 {
 	"magic": {
 		"magic": "packageinfo",
-		"version": 2,
+		"version": 2
 	},
 	"meta": {
-		"name": "jk_cmdoutputparsinghelper",
-		"version": "0.2021.12.30",
-		"packageClass": "python-module",
-		"language": "python3",
-		"development_status": "alpha",
-		"license": "proprietary",
-		"keywords": [
-		],
-		"description": "Assists in parsing output of *nix system commands such as df, systemctrl and others.",
 		"authors": [
 			{
-				"name": "Jürgen Knauth",
-				"email": "pubsrc@binary-overflow.de"
+				"email": "pubsrc@binary-overflow.de",
+				"name": "J\u00fcrgen Knauth"
 			}
 		],
+		"description": "Assists in parsing output of *nix system commands such as df, systemctrl and others.",
+		"development_status": "alpha",
+		"keywords": [],
+		"language": "python3",
+		"license": "proprietary",
+		"name": "jk_cmdoutputparsinghelper",
+		"packageClass": "python-module",
+		"version": "0.2023.2.9"
 	},
 	"requirements": {
-		"recommended_python_packages": [
+		"htmlcssjs_packages": [],
+		"python_packages": [
+			"jk_typing",
+			"jk_prettyprintobj",
+		],
+		"python_packages_dev": [],
+		"python_packages_recommended": [
 			"jk_datamatrix",
 		],
-		"python_packages": [
-		],
-		"python_packages_dev": [
-		],
-		"system_apt_packages": [
-		],
+		"system_apt_packages": []
 	},
 	"source": {
+		"extra_binary_files": [],
+		"extra_data_files": [],
 		"packages": [
 			"jk_cmdoutputparsinghelper"
-		],
-		"extra_data_files": [
-		],
-		"extra_binary_files": [
 		]
-	},
-	"documentation": [
-		/*
-		"wiki": {
-			"page": "DevDocs:jk_cmdoutputparsinghelper"
-		}
-		*/
-	],
-	"repositories": [
-	],
+	}
 }
-

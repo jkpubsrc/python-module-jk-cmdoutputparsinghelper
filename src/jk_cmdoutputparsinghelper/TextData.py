@@ -4,6 +4,8 @@
 import typing
 
 from .LineList import LineList
+from .CharMatrix import CharMatrix
+
 
 
 
@@ -103,6 +105,13 @@ class TextData(object):
 			return repr("\n".join(self.__data))
 		else:
 			return repr(self.__data)
+	#
+
+	def toCharMatrix(self) -> CharMatrix:
+		ret = CharMatrix()
+		for line in self.__data.split("\n"):
+			ret.addRow(line)
+		return ret
 	#
 
 #
