@@ -29,4 +29,5 @@
 
 * 2024-06-29
 	* Added: various convenience methods
+	* Migrated: from setup.py to pyproject.toml
 

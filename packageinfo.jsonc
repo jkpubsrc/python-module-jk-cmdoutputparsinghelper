@@ -14,7 +14,7 @@
 		"development_status": "alpha",
 		"keywords": [],
 		"language": "python3",
-		"license": "proprietary",
+		"license": "Apache2",
 		"name": "jk_cmdoutputparsinghelper",
 		"packageClass": "python-module",
 		"version": "0.2024.6.29"
