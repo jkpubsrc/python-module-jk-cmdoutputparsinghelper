@@ -17,13 +17,14 @@
 		"license": "proprietary",
 		"name": "jk_cmdoutputparsinghelper",
 		"packageClass": "python-module",
-		"version": "0.2023.2.9"
+		"version": "0.2024.6.29"
 	},
 	"requirements": {
 		"htmlcssjs_packages": [],
 		"python_packages": [
 			"jk_typing",
 			"jk_prettyprintobj",
+			"jk_typing",
 		],
 		"python_packages_dev": [],
 		"python_packages_recommended": [

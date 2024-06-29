@@ -3,6 +3,7 @@
 import typing
 
 import jk_typing
+import jk_prettyprintobj
 
 from .TextSpanInfo import TextSpanInfo
 
@@ -13,7 +14,7 @@ from .TextSpanInfo import TextSpanInfo
 #
 # This class represents space/non-space information about a sequence of characters boolean values.
 #
-class TextSpanInfoSequence(object):
+class TextSpanInfoSequence(jk_prettyprintobj.DumpMixin):
 
 	################################################################################################################################
 	## Constructor
@@ -97,6 +98,25 @@ class TextSpanInfoSequence(object):
 				ret.append(c)
 
 		return TextSpanInfoSequence(ret)
+	#
+
+	def mergeColumns(self, colNo1:int, colNo2:int):
+		assert isinstance(colNo1, int)
+		assert isinstance(colNo2, int)
+		assert colNo1 >= 0
+		assert colNo2 == colNo1+1
+
+		col1 = self.values[colNo1]
+		col2 = self.values[colNo2]
+		newCol = TextSpanInfo(col1.bIsSpace, col1.pos, col1.length + col2.length)
+		del self.values[colNo2]
+		self.values[colNo1] = newCol
+	#
+
+	def _dumpVarNames(self) -> typing.List[str]:
+		return [
+			"values",
+		]
 	#
 
 #

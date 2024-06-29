@@ -2,7 +2,7 @@
 
 
 __author__ = "Jürgen Knauth"
-__version__ = "0.2023.2.9"
+__version__ = "0.2024.6.29"
 
 
 
@@ -12,6 +12,7 @@ from .TextSpanInfo import TextSpanInfo
 from .TextSpanInfoSequence import TextSpanInfoSequence
 from .SpaceInfoSequence import SpaceInfoSequence
 
+from .StrNode import StrNode
 from .LineList import LineList
 from .CharMatrix import CharMatrix, ColumnPositionInfo
 from .ColumnDef import ColumnDef

@@ -27,6 +27,9 @@ ColumnPositionInfo = collections.namedtuple("ColumnPositionInfo", [
 
 
 
+
+CharMatrix = typing.NewType("CharMatrix", object)
+
 class CharMatrix(jk_prettyprintobj.DumpMixin):
 
 	class _Row(jk_prettyprintobj.DumpMixin):
@@ -112,6 +115,13 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 				row.expand(w)
 	#
 
+	def addRows(self, lines:typing.Union[typing.List[str],typing.Tuple[str]]):
+		assert isinstance(lines, (list,tuple))
+
+		for line in lines:
+			self.addRow(line)
+	#
+
 	def clear(self):
 		self.__width = 0
 		self.__rows.clear()
@@ -140,7 +150,7 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 	#
 	# @return		CharMatrix			Retuns a character matrix.
 	#
-	def extractColumn(self, colPos:ColumnPositionInfo, bIgnoreFirstLine:bool = False):
+	def extractColumn(self, colPos:ColumnPositionInfo, bIgnoreFirstLine:bool = False) -> CharMatrix:
 		assert isinstance(colPos, ColumnPositionInfo)
 		assert isinstance(bIgnoreFirstLine, bool)
 
@@ -164,7 +174,7 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 	#
 	# @return		CharMatrix[]		Retuns a list of character matrices.
 	#
-	def extractColumns(self, spanInfos:TextSpanInfoSequence, bIgnoreFirstLine:bool = False) -> list:
+	def extractColumns(self, spanInfos:TextSpanInfoSequence, bIgnoreFirstLine:bool = False) -> typing.List[CharMatrix]:
 		ret = []
 		for spanInfo in spanInfos:
 			ret.append(self.extractColumn(
@@ -258,7 +268,7 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 		return counts
 	#
 
-	def identifyTextColumnRanges(self, minGapLength:int = 1) -> TextSpanInfoSequence:
+	def identifyTextColumnRanges(self, minGapLength:int = 1, bSpanToNext:bool = False) -> TextSpanInfoSequence:
 		assert isinstance(minGapLength, int)
 		assert minGapLength > 0
 
@@ -273,6 +283,12 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 		compactedSpanInfos:TextSpanInfoSequence = columnSpaceFlags.compact()
 		compactedSpanInfos = compactedSpanInfos.thinoutSpaceSegments(minGapLength)
 		compactedSpanInfos = compactedSpanInfos.extractOnlyNonSpaceSegments()
+
+		if bSpanToNext:
+			for i in range(1, len(compactedSpanInfos.values)):
+				cur = compactedSpanInfos.values[i]
+				prev = compactedSpanInfos.values[i-1]
+				prev.length = cur.pos - prev.pos
 
 		# --------------------------------
 
@@ -338,8 +354,6 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 			else:
 				for i in range(0, len(spanInfos)):
 					columnDefs = ColumnDef(_headerTitles[i], None)
-
-		assert len(spanInfos) == len(columnDefs) == len(charMatrixList)
 
 		# convert the column matrices to values
 

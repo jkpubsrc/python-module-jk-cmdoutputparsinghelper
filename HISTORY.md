@@ -22,3 +22,11 @@
 	* Refactoring
 	* Added: Documentation
 	* Added: CharMatrix and various other classes
+
+* 2024-03-24
+	* Added: removeAllEmptyLines()
+	* Added: groupByIndentation()
+
+* 2024-06-29
+	* Added: various convenience methods
+

@@ -27,6 +27,7 @@ setup(
 	install_requires = [
 		"jk_typing",
 		"jk_prettyprintobj",
+		"jk_typing",
 	],
 	keywords = [
 	],
@@ -41,7 +42,7 @@ setup(
 	],
 	scripts = [
 	],
-	version = '0.2023.2.9',
+	version = '0.2024.6.29',
 	zip_safe = False,
 	long_description = readme(),
 	long_description_content_type = "text/markdown",

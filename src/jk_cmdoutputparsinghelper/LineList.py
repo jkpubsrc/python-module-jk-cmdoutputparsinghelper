@@ -4,6 +4,7 @@ import typing
 
 from .ColumnDef import ColumnDef
 from .Table import Table
+from .StrNode import StrNode
 
 
 
@@ -410,6 +411,18 @@ class LineList(list):
 	#
 
 	#
+	# This method modifies this line list *in place*. It removes all emtpy lines.
+	#
+	def removeAllEmptyLines(self):
+		newList = []
+		for line in self:
+			if line:
+				newList.append(line)
+		self.clear()
+		self.extend(newList)
+	#
+
+	#
 	# This method modifies this line list *in place*. It calls <c>getLeadingSpaceCounts()</c> in order to get a map of leading spaces and then trims the start of the line to
 	# have all common (!) leading spaces removed.
 	#
@@ -514,6 +527,63 @@ class LineList(list):
 		return ret
 	#
 
+	#
+	# Build a hierarchy of nodes according to line indentation.
+	#
+	# @param	callable<<int,str>,StrNode>		(optional) A method that instantiates a StrNode (or a subclass of StrNode)
+	#
+	def groupByIndentation(self, nodeFactory:typing.Callable[[int,str],StrNode] = None, rootNodeFactory:typing.Callable[[int,str],StrNode] = None) -> StrNode:
+		if nodeFactory == None:
+			nodeFactory = StrNode
+		else:
+			assert callable(nodeFactory)
+
+		if rootNodeFactory == None:
+			rootNodeFactory = StrNode
+		else:
+			assert callable(rootNodeFactory)
+
+		# ----
+
+		indentationTextTuples:typing.List[typing.Tuple[int,str]] = list(zip(self.getLeadingSpaceCounts(), self))
+		if len(indentationTextTuples) == 0:
+			raise Exception("No data")
+
+		rootNode = rootNodeFactory(-1, "<root>")
+
+		parentNode = None
+		stack:typing.List[StrNode] = []
+		currentTopNode = rootNode
+
+		for nLevel, text in indentationTextTuples:
+			newNode = nodeFactory(nLevel, text)
+
+			if newNode.nLevel > currentTopNode.nLevel:
+				# this is a child node
+				stack.append(parentNode)
+				currentTopNode.children.append(newNode)
+				parentNode = currentTopNode
+				currentTopNode = newNode
+				continue
+
+			# on same level or below
+			while True:
+				if newNode.nLevel < currentTopNode.nLevel:
+					# below -> pop stack
+					currentTopNode = parentNode
+					parentNode = stack.pop()
+					continue
+				if newNode.nLevel == currentTopNode.nLevel:
+					# same level
+					break
+				# error
+				raise Exception("Error in input data: There is no element on the stack with corresponding level")
+
+			parentNode.children.append(newNode)
+			currentTopNode = newNode
+
+		return rootNode
+	#
 
 	################################################################################################################################
 	## Static Methods
