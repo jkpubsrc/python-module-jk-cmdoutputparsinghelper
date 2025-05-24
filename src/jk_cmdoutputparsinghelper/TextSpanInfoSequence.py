@@ -113,6 +113,29 @@ class TextSpanInfoSequence(jk_prettyprintobj.DumpMixin):
 		self.values[colNo1] = newCol
 	#
 
+	#
+	# If you calculate the columns on the title column alone the last span will only span to the end of the title column,
+	# Maybe this is too short. In that case call this method to enlarge the last span until it spans the desired maximum
+	# line length you want it to span.
+	#
+	def expandWidthTo(self, maxLen:int):
+		assert isinstance(maxLen, int)
+		assert maxLen >= 0
+
+		_lsp = self.values[-1]
+		assert maxLen >= _lsp.pos + _lsp.length
+		_lsp.length = maxLen - _lsp.pos
+	#
+
+	def __getitem__(self, ii:int) -> TextSpanInfo:
+		return self.values[ii]
+	#
+
+	def __setitem__(self, ii:int, value:TextSpanInfo) -> None:
+		assert isinstance(value, TextSpanInfo)
+		self.values[ii] = value
+	#
+
 	def _dumpVarNames(self) -> typing.List[str]:
 		return [
 			"values",

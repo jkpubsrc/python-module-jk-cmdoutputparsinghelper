@@ -138,7 +138,7 @@ class Table(list):
 	#
 	# NOTE: Invoking this method requires the python module "<c>jk_datamatrix</c>" to be installed.
 	#
-	def toDataMatrix(self, columnDefs:typing.List[ColumnDef] = None):
+	def toDataMatrix(self, columnDefs:typing.List[ColumnDef] = None) -> jk_datamatrix.DataMatrix:
 		if not bHasDataMatrix:
 			raise Exception("For invoking toDataMatrix() you need to install jk_datamatrix first: 'pip install jk_datamatrix'")
 
@@ -168,7 +168,7 @@ class Table(list):
 	#
 	# Returns an iterator that provides dictionaries of data, one for each row.
 	#
-	def rowDictIterator(self):
+	def rowDictIterator(self) -> typing.Iterable[typing.Dict[str,typing.Any]]:
 		_nColumns = self.nColumns
 		for row in self:
 			ret = {}

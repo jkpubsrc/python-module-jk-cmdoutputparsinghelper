@@ -31,3 +31,11 @@
 	* Added: various convenience methods
 	* Migrated: from setup.py to pyproject.toml
 
+* 2024-08-10
+	* Bugfix: Fixed processing column headings
+
+* 2025-05-24
+	* Improved: Added type hints
+	* Improved: Documentation
+
+

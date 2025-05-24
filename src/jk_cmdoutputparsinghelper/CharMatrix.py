@@ -268,6 +268,11 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 		return counts
 	#
 
+	#
+	# @param	bool bSpanToNext		(optional) If <c>true<c> a span will automatically end where the next one starts.
+	#									If <c>false</c> a span will end right after the last character of this column.
+	#									(Default value: <c>false</code>)
+	#
 	def identifyTextColumnRanges(self, minGapLength:int = 1, bSpanToNext:bool = False) -> TextSpanInfoSequence:
 		assert isinstance(minGapLength, int)
 		assert minGapLength > 0
@@ -350,10 +355,10 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 			columnDefs = []
 			if _headerTitles is None:
 				for i in range(0, len(spanInfos)):
-					columnDefs = ColumnDef(str(i), None)
+					columnDefs.append(ColumnDef(str(i), None))
 			else:
 				for i in range(0, len(spanInfos)):
-					columnDefs = ColumnDef(_headerTitles[i], None)
+					columnDefs.append(ColumnDef(_headerTitles[i], None))
 
 		# convert the column matrices to values
 
