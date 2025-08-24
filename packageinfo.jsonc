@@ -17,7 +17,7 @@
 		"license": "Apache2",
 		"name": "jk_cmdoutputparsinghelper",
 		"packageClass": "python-module",
-		"version": "0.2025.5.24"
+		"version": "0.2025.8.24"
 	},
 	"requirements": {
 		"htmlcssjs_packages": [],

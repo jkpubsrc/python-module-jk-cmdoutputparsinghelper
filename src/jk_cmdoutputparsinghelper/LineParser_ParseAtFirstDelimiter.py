@@ -40,31 +40,63 @@ class LineParser_ParseAtFirstDelimiter(object):
 	## Public Methods
 	################################################################################################################################
 
-	def parseLinesReturnList(self, lines:typing.Union[tuple,list], valueParserMap:dict = None) -> list:
+	# def parseLinesReturnList(self, lines:typing.Union[tuple,list], valueParserMap:typing.Union[dict,None] = None) -> list:
+	# 	assert isinstance(lines, (tuple, list))
+	# 	if valueParserMap is not None:
+	# 		assert isinstance(valueParserMap, dict)
+	#
+	# 	# ---
+	#
+	# 	ret = []
+	#
+	# 	for line in lines:
+	# 		if not line and self.bIgnoreEmptyLines:
+	# 			continue
+	# 		k, v = line
+	#
+	# 		if valueParserMap is None:
+	# 			ret.append(self.parseLine(line))
+	# 		else:
+	# 			valueParser = valueParserMap.get(k)
+	# 			if valueParser is None:
+	# 				continue
+	# 			assert isinstance(valueParser, ValueParserDef)
+	# 			if valueParser.parseFunc is not None:
+	# 				v = valueParser.parseFunc(v)
+	# 			ret.append(self.parseLine(line))
+	#
+	# 	return ret
+	# #
+
+	def parseLinesReturnList(self, lines:typing.Union[tuple,list], valueParserMap:typing.Union[typing.Dict[str,ValueParserDef],None] = None) -> list:
 		assert isinstance(lines, (tuple, list))
 		if valueParserMap is not None:
 			assert isinstance(valueParserMap, dict)
-
+	
 		# ---
-
+	
 		ret = []
-
+	
 		for line in lines:
 			if not line and self.bIgnoreEmptyLines:
 				continue
-			k, v = line
-			valueParser = valueParserMap.get(k)
-			if valueParser is None:
-				continue
-			assert isinstance(valueParser, ValueParserDef)
-			if valueParser.parseFunc is not None:
-				v = valueParser.parseFunc(v)
-			ret.append(self.parseLine(line))
-
+			k, v = self.parseLine(line)
+	
+			if valueParserMap is None:
+				ret.append(v)
+			else:
+				valueParser = valueParserMap.get(k)
+				if valueParser is None:
+					continue
+				assert isinstance(valueParser, ValueParserDef)
+				if valueParser.parseFunc is not None:
+					v = valueParser.parseFunc(v)
+				ret.append(v)
+	
 		return ret
 	#
 
-	def parseLinesReturnDict(self, lines:typing.Union[tuple,list], valueParserMap:dict = None) -> dict:
+	def parseLinesReturnDict(self, lines:typing.Union[tuple,list], valueParserMap:typing.Union[typing.Dict[str,ValueParserDef],None] = None) -> typing.Dict[str,typing.Any]:
 		assert isinstance(lines, (tuple, list))
 		if valueParserMap is not None:
 			assert isinstance(valueParserMap, dict)
@@ -76,19 +108,23 @@ class LineParser_ParseAtFirstDelimiter(object):
 			if not line and self.bIgnoreEmptyLines:
 				continue
 			k, v = self.parseLine(line)
+
 			if k:
-				valueParser = valueParserMap.get(k)
-				if valueParser is None:
-					continue
-				assert isinstance(valueParser, ValueParserDef)
-				if valueParser.parseFunc is not None:
-					v = valueParser.parseFunc(v)
-				ret[valueParser.outputKey] = v
+				if valueParserMap is None:
+					ret[k] = v
+				else:
+					valueParser = valueParserMap.get(k)
+					if valueParser is None:
+						continue
+					assert isinstance(valueParser, ValueParserDef)
+					if valueParser.parseFunc is not None:
+						v = valueParser.parseFunc(v)
+					ret[valueParser.outputKey] = v
 
 		return ret
 	#
 
-	def parseLine(self, line:str) -> tuple:
+	def parseLine(self, line:str) -> typing.Tuple[typing.Union[str,None],typing.Union[str,None]]:
 		assert isinstance(line, str)
 
 		pos = line.find(self.delimiter)

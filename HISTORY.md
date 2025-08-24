@@ -38,4 +38,8 @@
 	* Improved: Added type hints
 	* Improved: Documentation
 
+* 2025-08-24
+	* Improved: Added type hints
+	* Bugfix
+
 
