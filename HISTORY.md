@@ -42,4 +42,15 @@
 	* Improved: Added type hints
 	* Bugfix
 
+* 2025-09-23
+	* Improved: LineList and TextData
+	* Bugfix: TextData
+	* Minor improvements
+
+* 2025-11-29:
+	* Added: Properties width and height to LineList
+
+* 2025-12-03:
+	* Fixed: bool(..) of TextData object
+
 

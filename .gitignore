@@ -7,22 +7,29 @@ src/*.egg-info/
 .vscode
 
 examples/*.log
-examples/*.txt
 testing/*.sh
 
 **/OLD
 **/*_old
 **/*_OLD
 **/*.OLD
+**/*.old
 **/*.bak
+**/*.DEACTIVATED
+**/*.SAVED
 OLD
 *_old
 *_OLD
 *.OLD
+*.old
 *.bak
+*.DEACTIVATED
+*.SAVED
+*.DRAFT
 
-install*.sh
-publish*.sh
-uninstall*.sh
-test*.sh
+**/*.sh
+*.sh
+_tools/
 
+TEMP
+dist

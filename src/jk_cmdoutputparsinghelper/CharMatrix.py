@@ -1,6 +1,5 @@
 
 
-import os
 import typing
 import collections
 
@@ -34,16 +33,19 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 
 	class _Row(jk_prettyprintobj.DumpMixin):
 
+		__slots__ = (
+			"text",
+			"chars",
+		)
+
 		def __init__(self, text:str, chars:typing.List[str]) -> None:
 			self.text = text
 			self.chars = chars
 		#
 
-		def _dumpVarNames(self) -> typing.List[str]:
-			return [
-				"text",
-				"chars",
-			]
+		def _dump(self, ctx:jk_prettyprintobj.DumpCtx):
+			ctx.dumpVar("text", self.text)
+			ctx.dumpVar("chars", self.chars, "shorten")
 		#
 
 		def expand(self, width:int):
@@ -211,6 +213,10 @@ class CharMatrix(jk_prettyprintobj.DumpMixin):
 
 	#
 	# Convert all rows in this matrix to values.
+	#
+	# @param	parserFunction		(optional) If specified this function is invoked for each row passing the (possibly trimmed)
+	# 								string to this function and using the data returned as value.
+	# 								If no parser function is specified the unprocessed string is used as value.
 	#
 	def rowsToValues(self, bTrimLeft:bool = True, bTrimRight:bool = True, bIgnoreFirstLine:bool = False, parserFunction = None) -> list:
 		assert isinstance(bTrimLeft, bool)

@@ -3,6 +3,7 @@
 import typing
 
 import jk_typing
+import jk_prettyprintobj
 
 from .TextSpanInfo import TextSpanInfo
 from .TextSpanInfoSequence import TextSpanInfoSequence
@@ -13,9 +14,10 @@ from .TextSpanInfoSequence import TextSpanInfoSequence
 
 
 #
-# This class represents space/non-space information about a sequence of characters boolean values.
+# This class represents space/non-space information sequence.
+# Each space is represented as value `True` while non-space characters are represented as `False`.
 #
-class SpaceInfoSequence(object):
+class SpaceInfoSequence(jk_prettyprintobj.DumpMixin):
 
 	################################################################################################################################
 	## Constructor
@@ -42,6 +44,12 @@ class SpaceInfoSequence(object):
 	################################################################################################################################
 	## Helper Methods
 	################################################################################################################################
+
+	def _dump(self, ctx:jk_prettyprintobj.DumpCtx):
+		tf = [ "^" if x else "." for x in self.values ]
+		# tf = [ "1" if x else "0" for x in self.values ]
+		ctx.dumpVar("values", "".join(tf))
+	#
 
 	################################################################################################################################
 	## Public Methods

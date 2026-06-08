@@ -11,10 +11,16 @@ from .TextSpanInfo import TextSpanInfo
 
 
 
+TextSpanInfoSequence = typing.NewType("TextSpanInfoSequence", object)
+
 #
 # This class represents space/non-space information about a sequence of characters boolean values.
 #
 class TextSpanInfoSequence(jk_prettyprintobj.DumpMixin):
+
+	__slots__ = (
+		"values",
+	)
 
 	################################################################################################################################
 	## Constructor
@@ -62,7 +68,7 @@ class TextSpanInfoSequence(jk_prettyprintobj.DumpMixin):
 		return self.__str__()
 	#
 
-	def thinoutSpaceSegments(self, minLength:int):				# -> TextSpanInfoSequence
+	def thinoutSpaceSegments(self, minLength:int) -> TextSpanInfoSequence:
 		ret = list(self.values)
 
 		# set unwanted spaces to non-spaces
@@ -90,7 +96,7 @@ class TextSpanInfoSequence(jk_prettyprintobj.DumpMixin):
 		return TextSpanInfoSequence(ret)
 	#
 
-	def extractOnlyNonSpaceSegments(self):				# -> TextSpanInfoSequence
+	def extractOnlyNonSpaceSegments(self) -> TextSpanInfoSequence:
 		ret = []
 
 		for c in self.values:

@@ -11,7 +11,7 @@ from .StrNode import StrNode
 
 
 
-class LineList(list):
+class LineList(list[str]):
 
 	################################################################################################################################
 	## Constructors
@@ -22,12 +22,15 @@ class LineList(list):
 		if len(args) == 0:
 			pass
 		elif len(args) == 1:
-			if isinstance(args[0], str):
-				self.extend(args[0].rstrip().split("\n"))
-			elif isinstance(args[0], (tuple,list)):
-				self.extend(args[0])
+			xFirst = args[0]
+			if isinstance(xFirst, str):
+				self.extend(xFirst.rstrip().split("\n"))
+			elif isinstance(xFirst, (tuple,list)):
+				for item in xFirst:
+					assert isinstance(item, str)
+				self.extend(xFirst)
 			else:
-				raise TypeError()
+				raise TypeError(type(xFirst))
 		else:
 			raise Exception("Parameters!")
 	#
@@ -36,6 +39,21 @@ class LineList(list):
 	## Public Properties
 	################################################################################################################################
 
+	@property
+	def width(self) -> int:
+		nmax = 0
+		for line in self:
+			x = len(line)
+			if x > nmax:
+				nmax = x
+		return nmax
+	#
+
+	@property
+	def height(self) -> int:
+		return len(self)
+	#
+
 	################################################################################################################################
 	## Helper Methods
 	################################################################################################################################
@@ -43,6 +61,54 @@ class LineList(list):
 	################################################################################################################################
 	## Public Methods
 	################################################################################################################################
+
+	#
+	# Identify a common space prefix for all lines.
+	#
+	# There must be at least one line in this list.
+	#
+	def identifyCommonLeadingSpacePrefix(self) -> str:
+		if not self:
+			return ""
+
+		# ----
+
+		firstLine = self[0]
+
+		ret:list[str] = []
+
+		for i in range(0, len(firstLine)):
+			c = firstLine[i]
+			if not c.isspace():
+				break
+			if not self.isCharColumn(c, i, bIgnoreSmallerRows=True):
+				break
+			ret.append(c)
+
+		return "".join(ret)
+	#
+
+	#
+	# Identify a common space prefix for all lines and remove it.
+	#
+	# There must be at least one line in this list.
+	#
+	# @return		Returns <c>true</c> on success.
+	#
+	def removeCommonLeadingSpacePrefix(self) -> bool:
+		nSkip = len(self.identifyCommonLeadingSpacePrefix())
+		if nSkip == 0:
+			return False
+
+		newData = []
+		for line in self:
+			newData.append(line[nSkip:])
+
+		self.clear()
+		self.extend(newData)
+
+		return True
+	#
 
 	#
 	# Returns a line numbers of lines that are empty.
@@ -70,6 +136,11 @@ class LineList(list):
 	# Check if the specified column is a vertical space column (= all characters at position <i>pos</i> are spaces)
 	#
 	def isSpaceColumn(self, pos:int) -> bool:
+		assert isinstance(pos, int)
+		assert pos >= 0
+
+		# ----
+
 		for i in range(0, len(self)):
 			line = self[i]
 			if pos < len(line):
@@ -77,6 +148,28 @@ class LineList(list):
 					#print("@ " + str(pos) + " with " + repr(line[pos]) + " of " + repr(line))
 					return False
 		#print("@ " + str(pos) + " is space")
+		return True
+	#
+
+	def isCharColumn(self, c:str, pos:int, *, bIgnoreSmallerRows:bool = False) -> bool:
+		assert isinstance(c, str)
+		assert len(c) == 1
+		assert isinstance(pos, int)
+		assert pos >= 0
+		assert isinstance(bIgnoreSmallerRows, bool)
+
+		# ----
+
+		for iRow in range(0, len(self)):
+			line = self[iRow]
+			if pos < len(line):
+				if bIgnoreSmallerRows:
+					continue
+				else:
+					return False
+			if line[pos] != c:
+				return False
+
 		return True
 	#
 

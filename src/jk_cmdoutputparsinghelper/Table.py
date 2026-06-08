@@ -19,8 +19,12 @@ from .ColumnDef import ColumnDef
 # This class is derived from <c>list</c> and represents a very simple table. The items in this (table) list are rows of this table.
 # The member <c>columnDefs</c> stores an array of <c>ColumnDef</c> objects that provide information about each column.
 #
-class Table(list):
+class Table(list[list[str]]):
 	# @field		ColumnDef[] columnDefs		The table column definitions
+
+	__slots__ = (
+		"columnDefs",
+	)
 
 	################################################################################################################################
 	## Constructors
@@ -30,7 +34,7 @@ class Table(list):
 	# @param		ColumnDef[] columnDefs		The table column definitions
 	# @param		str[][] rows				The list of row data for this table.
 	#
-	def __init__(self, columnDefs:typing.List[ColumnDef], rows:list):
+	def __init__(self, columnDefs:typing.List[ColumnDef], rows:list[str]):
 		assert isinstance(columnDefs, (tuple, list))
 		assert isinstance(rows, (tuple, list))
 		if len(rows) > 0:
@@ -131,6 +135,26 @@ class Table(list):
 			printFunc("".join(sout))
 			
 		printFunc(prefix + "}")
+	#
+
+	def getColumnData(self, column:int|str) -> list[str]:
+		nCol = -1
+		if isinstance(column, int):
+			if (column >= 0) and (column < len(self.columnDefs)):
+				nCol = column
+		elif isinstance(column, str):
+			for i, col in enumerate(self.columnDefs):
+				if col.name == column:
+					nCol = i
+					break
+
+		if nCol < 0:
+			raise Exception(f"Invalid column: {column!r}")
+
+		ret = []
+		for i in range(0, len(self)):
+			ret.append(self[i][nCol])
+		return ret
 	#
 
 	#

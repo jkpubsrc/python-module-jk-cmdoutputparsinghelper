@@ -24,6 +24,11 @@ from .CharMatrix import CharMatrix
 #
 class TextData(object):
 
+	__slots__ = (
+		"__dataStr",
+		"__dataLines",
+	)
+
 	################################################################################################################################
 	## Constructor
 	################################################################################################################################
@@ -31,13 +36,17 @@ class TextData(object):
 	#
 	# Constructor method.
 	#
-	def __init__(self, data:typing.Union[str,tuple,list,LineList]):
-		self.__bStoringLines = False
-		self.__data = ""
+
+	def __init__(self, data:str|tuple[str]|list[str]|LineList):
+		self.__dataStr:str|None = None
+		self.__dataLines:LineList|None = None
+
 		if isinstance(data, str):
 			self.text = data
-		else:
+		elif isinstance(data, (tuple,list,LineList)):
 			self.lines = data
+		else:
+			raise TypeError(str(type(data)))
 	#
 
 	################################################################################################################################
@@ -46,43 +55,41 @@ class TextData(object):
 
 	@property
 	def lines(self) -> LineList:
-		if not self.__bStoringLines:
+		if self.__dataLines is None:
 			# convert to lines
-			if self.__data:
-				self.__data = LineList(self.__data.split("\n"))
-			else:
-				self.__data = LineList()
-			self.__bStoringLines = True
-		return self.__data
+			self.__dataLines = LineList(self.__dataStr.split("\n"))
+
+		return self.__dataLines
 	#
 
 	@lines.setter
-	def lines(self, value:typing.Union[tuple,list,LineList]):
-		assert isinstance(value, (tuple, list, LineList))
-		for x in value:
-			assert isinstance(x, str)
-
-		if isinstance(value, LineList):
-			self.__data = value
+	def lines(self, value:tuple[str]|list[str]|LineList):
+		if isinstance(value, (tuple, list)):
+			for x in value:
+				assert isinstance(x, str)
+			self.__dataLines = LineList(value)
+		elif isinstance(value, LineList):
+			self.__dataLines = value
 		else:
-			self.__data = LineList(value)
-		self.__bStoringLines = True
+			raise TypeError(str(type(value)))
+		self.__dataStr = None
 	#
 
 	@property
 	def text(self) -> str:
-		if self.__bStoringLines:
+		if self.__dataStr is None:
 			# convert to text
-			self.__data = "\n".join(self.__data)
-			self.__bStoringLines = False
-		return self.__data
+			self.__dataStr = "\n".join(self.__dataLines)
+		return self.__dataStr
 	#
 
 	@text.setter
 	def text(self, value:str):
-		assert isinstance(value, str)
-		self.__data = value
-		self.__bStoringLines = False
+		if isinstance(value, str):
+			self.__dataStr = value
+		else:
+			raise TypeError(str(type(value)))
+		self.__dataLines = None
 	#
 
 	################################################################################################################################
@@ -94,22 +101,24 @@ class TextData(object):
 	################################################################################################################################
 
 	def __str__(self):
-		if self.__bStoringLines:
-			return "\n".join(self.__data)
-		else:
-			return self.__data
+		if self.__dataStr is None:
+			self.__dataStr = "\n".join(self.__dataLines)
+		return self.__dataStr
 	#
 
 	def __repr__(self):
-		if self.__bStoringLines:
-			return repr("\n".join(self.__data))
-		else:
-			return repr(self.__data)
+		return repr(self.__str__())
+	#
+
+	def __bool__(self):
+		return bool(self.text)
 	#
 
 	def toCharMatrix(self) -> CharMatrix:
 		ret = CharMatrix()
-		for line in self.__data.split("\n"):
+		if self.__dataLines is None:
+			self.__dataLines = LineList(self.__dataStr.split("\n"))
+		for line in self.__dataLines:
 			ret.addRow(line)
 		return ret
 	#
